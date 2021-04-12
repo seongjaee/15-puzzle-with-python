@@ -5,7 +5,7 @@ import time
 def reshape(board):
     return [board[:4],board[4:8],board[8:12],board[12:16]]
 
-# Find the location of 16 
+# Find the location of num
 def where_num(board, num):
     for i in range(0,4):
         for j in range(0,4):
