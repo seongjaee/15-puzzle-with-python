@@ -97,8 +97,9 @@ clock = pygame.time.Clock()
 # Game title
 pygame.display.set_caption("15-puzzle")
 
-# Icon
+# Image
 icon = pygame.image.load(img_path+'icon.png')
+note = pygame.image.load(img_path+'note.png')
 pygame.display.set_icon(icon)
 
 # Screen
@@ -111,34 +112,28 @@ move_sound = pygame.mixer.Sound(sound_path + 'move.wav')
 restart_sound = pygame.mixer.Sound(sound_path + 'restart.wav')
 
 # Font
-timer_font = pygame.font.SysFont("arial", 20)
-text_font = pygame.font.SysFont("arial", 30)
-text = text_font.render('Space to restart', True, (200,200,200))
+timer_font = pygame.font.SysFont('calibri', 25)
 
 # Padding
 pd = 4
 y_pd = 60
 x_pd = 24
 
-# Create block objects and draw
+# Create block objects
 block_list = [Block(n) for n in range(1, 17)]
 
-for block in block_list:
-    screen.blit(block.image, block.get_pos())
-
 start_ticks = pygame.time.get_ticks()
-
 playing = True
+
 # Game loop
 while playing:
     clock.tick(60)
-
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             playing = False
         
         elif event.type == pygame.KEYDOWN:
-            
+      
             # Move blocks
             if event.key == pygame.K_UP:
                 brd.move(1)
@@ -162,21 +157,19 @@ while playing:
                 brd.shuffle()
                 restart_sound.play()
         
-    # Draw background
+    # Draw
     screen.fill((40,10,70))
-    
-    # Draw blocks
+   
     for block in block_list:
         screen.blit(block.image, block.get_pos())
-                
-    timer = timer_font.render(f'{(pygame.time.get_ticks() - start_ticks)/1000:.2f}', True, (200,200,200))
-    screen.blit(timer, (240, 15))
-    screen.blit(text, (60, 355))
+    
+    timer = timer_font.render(f'{(pygame.time.get_ticks() - start_ticks)/1000:.1f}', True, (200,200,200))
+    screen.blit(timer, (230, 20))
+    screen.blit(note, (0, 340))
     pygame.display.update()
     pygame.display.flip()
-    
-    if brd.is_clear():
-        # Stop game and wait for event
+     
+    if brd.is_clear(): # Stop game and wait for event
         while True:
             event = pygame.event.wait()
             if event.type == pygame.QUIT:        # Quit
