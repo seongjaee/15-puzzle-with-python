@@ -135,20 +135,25 @@ while playing:
             # Move blocks
             if event.key == pygame.K_UP:
                 brd.move(1)
+                move_sound.play()
                 
             elif event.key == pygame.K_DOWN:
                 brd.move(0)
+                move_sound.play()
                 
             elif event.key == pygame.K_RIGHT:
                 brd.move(3)
+                move_sound.play()
                 
             elif event.key == pygame.K_LEFT:
                 brd.move(2)
+                move_sound.play()
             
             # Restart the game
             elif event.key == pygame.K_SPACE:
                 start_ticks = pygame.time.get_ticks()
                 brd.shuffle()
+                restart_sound.play()
         
     # Draw background
     screen.fill((40,10,70))
@@ -174,4 +179,6 @@ while playing:
                 if event.key == pygame.K_SPACE:
                     start_ticks = pygame.time.get_ticks()
                     brd.shuffle()
+                    restart_sound.play()
+
                     break
