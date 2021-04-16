@@ -19,7 +19,7 @@ def is_solvable(board):
         if num != 16:
             cnt += sum([num>x for x in board[idx+1:]])
         else:
-            cnt += (idx+1)//4+1
+            cnt += idx//4 + 1
             
     return cnt % 2 == 0 # True if solvable
         
