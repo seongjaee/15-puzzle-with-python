@@ -62,7 +62,7 @@ class Block(pygame.sprite.Sprite):
     def __init__(self, num):
         pygame.sprite.Sprite.__init__(self)
         
-        self.image =  pygame.image.load(sprite_path +f'img{num}.png')
+        self.image =  pygame.image.load(img_path +f'img{num}.png')
         self.rect = self.image.get_rect()
         self.num = num
 
@@ -81,7 +81,7 @@ def where_num(board, num):
                 return i,j
 
 # file path
-sprite_path = './img/'
+img_path = './img/'
 sound_path = './sound/'
 
 # Initialize Board
@@ -93,6 +93,13 @@ pygame.init()
 
 # FPS
 clock = pygame.time.Clock()
+
+# Game title
+pygame.display.set_caption("15-puzzle")
+
+# Icon
+icon = pygame.image.load(img_path+'icon.png')
+pygame.display.set_icon(icon)
 
 # Screen
 size = [300,400]
