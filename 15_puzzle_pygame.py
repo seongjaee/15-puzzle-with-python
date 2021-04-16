@@ -62,7 +62,7 @@ class Block(pygame.sprite.Sprite):
     def __init__(self, num):
         pygame.sprite.Sprite.__init__(self)
         
-        self.image =  pygame.image.load(path +f'/img{num}.png')
+        self.image =  pygame.image.load(path +f'img{num}.png')
         self.rect = self.image.get_rect()
         self.num = num
 
@@ -80,8 +80,9 @@ def where_num(board, num):
             if board[i][j] == num:
                 return i,j
 
-# Sprite image path
-path = './img'
+# file path
+sprite_path = './img/'
+sound_path = './sound/'
 
 # Initialize Board
 brd = Board()
@@ -97,6 +98,10 @@ clock = pygame.time.Clock()
 size = [300,400]
 screen = pygame.display.set_mode(size)
 screen.fill((40,10,70))
+
+# Sound
+move_sound = pygame.mixer.Sound(path + 'move.wav')
+restart_sound = pygame.mixer.Sound(path + 'restart.wav')
 
 # Font
 timer_font = pygame.font.SysFont("arial", 20)
