@@ -75,7 +75,7 @@ def where_num(board, num):
                 return i,j
 
 # Sprite image path
-path = 'C:/Users/Seong/JupyterNotebookDoc/pygame_basic'
+path = './img'
 
 # Initialize Board
 brd = Board()
