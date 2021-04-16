@@ -1,5 +1,5 @@
 import pygame
-import sys, random, time
+import random, time
 
 class Board:
     def __init__(self):
