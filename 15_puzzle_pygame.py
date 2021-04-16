@@ -6,8 +6,8 @@ class Board:
         temp = list(range(1,17))
         random.shuffle(temp)
         self.board = [temp[:4], temp[4:8], temp[8:12], temp[12:16]]
-    
-    # Shuffle the board
+        
+    # Check whether puzzle is solvable or not
     def check_solvable(self):
         flattened = [num for row in self.board for num in row]
         cnt = 0
@@ -15,7 +15,7 @@ class Board:
             if num != 16:
                 cnt += sum([num>x for x in flattened[idx+1:]])
             else:
-                cnt += (idx+1)//4+1
+                cnt += idx//4+1
             
         if cnt%2 != 0:
             idx_14 = where_num(self.board, 14)
@@ -23,6 +23,12 @@ class Board:
             self.board[idx_14[0]][idx_14[1]] = 15
             self.board[idx_15[0]][idx_15[1]] = 14
         
+    def shuffle(self):
+        flattened = [num for row in self.board for num in row]
+        random.shuffle(flattened)
+        self.board = [flattened[:4], flattened[4:8], flattened[8:12], flattened[12:16]]
+        self.check_solvable()
+
     # Move the block
     def move(self, direction):
         y, x = where_num(self.board, 16)
@@ -133,13 +139,11 @@ while playing:
                 
             elif event.key == pygame.K_LEFT:
                 brd.move(2)
-                
-            #elif event.key == pygame.K_SPACE:
-            #    game_restart()
             
-            if brd.is_clear():
-                print('Clear!')
-                playing = False
+            # Restart the game
+            elif event.key == pygame.K_SPACE:
+                start_ticks = pygame.time.get_ticks()
+                brd.shuffle()
         
     # Draw background
     screen.fill((40,10,70))
@@ -150,8 +154,19 @@ while playing:
                 
     timer = timer_font.render(f'{(pygame.time.get_ticks() - start_ticks)/1000:.2f}', True, (200,200,200))
     screen.blit(timer, (240, 15))
-    # screen.blit(text, (60, 355))
+    screen.blit(text, (60, 355))
     pygame.display.update()
     pygame.display.flip()
     
-time.sleep(1)
+    if brd.is_clear():
+        # Stop game and wait for event
+        while True:
+            event = pygame.event.wait()
+            if event.type == pygame.QUIT:        # Quit
+                playing = False
+                break
+            elif event.type == pygame.KEYDOWN:   # Space bar -> Restart
+                if event.key == pygame.K_SPACE:
+                    start_ticks = pygame.time.get_ticks()
+                    brd.shuffle()
+                    break
