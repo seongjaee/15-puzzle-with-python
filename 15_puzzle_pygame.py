@@ -3,27 +3,30 @@ import sys, random, time
 
 class Board:
     def __init__(self):
-        self.board = list(range(1,17))
-        self.is_clear = False
+        temp = list(range(1,17))
+        random.shuffle(temp)
+        self.board = [temp[:4], temp[4:8], temp[8:12], temp[12:16]]
     
     # Shuffle the board
-    def shff_board(self):
-        random.shuffle(self.board)
-        
-        if not (is_solvable(self.board)): # if not solvable, switch 14 and 15
-            idx_14 = self.board.index(14)
-            idx_15 = self.board.index(15)
-            self.board[idx_14] = 15
-            self.board[idx_15] = 14
+    def check_solvable(self):
+        flattened = [num for row in self.board for num in row]
+        cnt = 0
+        for idx, num in enumerate(flattened):
+            if num != 16:
+                cnt += sum([num>x for x in flattened[idx+1:]])
+            else:
+                cnt += (idx+1)//4+1
             
-        # Method for reshaping (16,0) list -> (4,4) list
-        reshape = lambda x : [x[:4], x[4:8], x[8:12], x[12:16]]
-        self.board = reshape(self.board)
+        if cnt%2 != 0:
+            idx_14 = where_num(self.board, 14)
+            idx_15 = where_num(self.board, 15)
+            self.board[idx_14[0]][idx_14[1]] = 15
+            self.board[idx_15[0]][idx_15[1]] = 14
         
     # Move the block
     def move(self, direction):
         y, x = where_num(self.board, 16)
-        
+
         if direction == 0 and y != 0:   # Down
             temp = self.board[y-1][x]
             self.board[y][x] = temp
@@ -44,12 +47,10 @@ class Board:
             self.board[y][x] = temp
             self.board[y][x-1] = 16
             
-    # Check whether game over or not and set self.is_clear
-    def check_clear(self):
-        if self.board == [[4*i+1, 4*i+2, 4*i+3, 4*i+4] for i in range(0,4)]:
-            self.is_clear = True
-        return self.is_clear
-
+    # Check whether game over or not
+    def is_clear(self):
+        return self.board == [[4*i+1, 4*i+2, 4*i+3, 4*i+4] for i in range(0,4)]
+            
 
 class Block(pygame.sprite.Sprite):
     def __init__(self, num):
@@ -72,36 +73,19 @@ def where_num(board, num):
         for j in range(0,4):
             if board[i][j] == num:
                 return i,j
-            
-# Check the board whether solvable or not
-def is_solvable(board):
-    cnt = 0
-    for idx, num in enumerate(board):
-        if num != 16:
-            cnt += sum([num>x for x in board[idx+1:]])
-        else:
-            cnt += (idx+1)//4+1
-            
-    return cnt%2 == 0 # True if solvable
-
-def game_restart():
-    start_ticks = pygame.time.get_ticks()
-    brd.shff_board()    
 
 # Sprite image path
-path = './img'
+path = 'C:/Users/Seong/JupyterNotebookDoc/pygame_basic'
 
 # Initialize Board
 brd = Board()
-brd.shff_board()
+brd.check_solvable()
 
 # Initialize pygame
 pygame.init()
 
 # FPS
 clock = pygame.time.Clock()
-
-playing = True
 
 # Screen
 size = [300,400]
@@ -126,6 +110,7 @@ for block in block_list:
 
 start_ticks = pygame.time.get_ticks()
 
+playing = True
 # Game loop
 while playing:
     clock.tick(60)
@@ -152,12 +137,14 @@ while playing:
             #elif event.key == pygame.K_SPACE:
             #    game_restart()
             
-            if brd.check_clear():
+            if brd.is_clear():
                 print('Clear!')
                 playing = False
         
+    # Draw background
     screen.fill((40,10,70))
-    # Draw
+    
+    # Draw blocks
     for block in block_list:
         screen.blit(block.image, block.get_pos())
                 
@@ -167,4 +154,4 @@ while playing:
     pygame.display.update()
     pygame.display.flip()
     
-time.sleep(2)
+time.sleep(1)
