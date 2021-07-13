@@ -1,5 +1,11 @@
 import pygame
-import random, time
+import random, os, datetime
+from pathlib import Path
+
+# Change file directory
+DIR = Path(__file__).parent.absolute()
+DIR = f'{DIR}'.replace('\\','/')
+os.chdir(DIR)
 
 class Board:
     def __init__(self):
@@ -79,6 +85,7 @@ def where_num(board, num):
         for j in range(0,4):
             if board[i][j] == num:
                 return i,j
+
 
 # file path
 img_path = './img/'
@@ -175,6 +182,7 @@ while playing:
             if event.type == pygame.QUIT:        # Quit
                 playing = False
                 break
+
             elif event.type == pygame.KEYDOWN:   # Space bar -> Restart
                 if event.key == pygame.K_SPACE:
                     start_ticks = pygame.time.get_ticks()
@@ -182,3 +190,4 @@ while playing:
                     restart_sound.play()
 
                     break
+
