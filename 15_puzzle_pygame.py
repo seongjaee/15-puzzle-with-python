@@ -58,18 +58,30 @@ def action():
         elif event.type == pygame.KEYDOWN:
             # Move blocks
             if event.key == pygame.K_UP:
+                if event.mod == 1:
+                    brd.move(1)
+                    brd.move(1)
                 brd.move(1)
                 move_sound.play()
                 
             elif event.key == pygame.K_DOWN:
+                if event.mod == 1:
+                    brd.move(0)
+                    brd.move(0)
                 brd.move(0)
                 move_sound.play()
                 
             elif event.key == pygame.K_RIGHT:
+                if event.mod == 1:
+                    brd.move(3)
+                    brd.move(3)
                 brd.move(3)
                 move_sound.play()
                 
             elif event.key == pygame.K_LEFT:
+                if event.mod == 1:
+                    brd.move(2)
+                    brd.move(2)
                 brd.move(2)
                 move_sound.play()
             
@@ -128,7 +140,7 @@ playing = True
 while playing:
     clock.tick(60)
     action()
-    
+
     # Draw
     screen.fill((40,10,70))
     draw_blocks()
