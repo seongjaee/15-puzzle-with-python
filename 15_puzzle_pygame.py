@@ -1,98 +1,90 @@
 import pygame
-import random, os, datetime
+import random, os
 from pathlib import Path
+import Board
+import where
 
 # Change file directory
 DIR = Path(__file__).parent.absolute()
 DIR = f'{DIR}'.replace('\\','/')
 os.chdir(DIR)
 
-class Board:
-    def __init__(self):
-        temp = list(range(1,17))
-        random.shuffle(temp)
-        self.board = [temp[:4], temp[4:8], temp[8:12], temp[12:16]]
-        
-    # Check whether puzzle is solvable or not
-    def check_solvable(self):
-        flattened = [num for row in self.board for num in row]
-        cnt = 0
-        for idx, num in enumerate(flattened):
-            if num != 16:
-                cnt += sum([num>x for x in flattened[idx+1:]])
-            else:
-                cnt += idx//4+1
-            
-        if cnt%2 != 0:
-            idx_14 = where_num(self.board, 14)
-            idx_15 = where_num(self.board, 15)
-            self.board[idx_14[0]][idx_14[1]] = 15
-            self.board[idx_15[0]][idx_15[1]] = 14
-        
-    def shuffle(self):
-        flattened = [num for row in self.board for num in row]
-        random.shuffle(flattened)
-        self.board = [flattened[:4], flattened[4:8], flattened[8:12], flattened[12:16]]
-        self.check_solvable()
-
-    # Move the block
-    def move(self, direction):
-        y, x = where_num(self.board, 16)
-
-        if direction == 0 and y != 0:   # Down
-            temp = self.board[y-1][x]
-            self.board[y][x] = temp
-            self.board[y-1][x] = 16
-            
-        elif direction == 1 and y != 3: # Up
-            temp = self.board[y+1][x]
-            self.board[y][x] = temp
-            self.board[y+1][x] = 16
-            
-        elif direction == 2 and x != 3: # Right
-            temp = self.board[y][x+1]
-            self.board[y][x] = temp
-            self.board[y][x+1] = 16
-            
-        elif direction == 3 and x != 0: # Left
-            temp = self.board[y][x-1]
-            self.board[y][x] = temp
-            self.board[y][x-1] = 16
-            
-    # Check whether game over or not
-    def is_clear(self):
-        return self.board == [[4*i+1, 4*i+2, 4*i+3, 4*i+4] for i in range(0,4)]
-            
-
 class Block(pygame.sprite.Sprite):
     def __init__(self, num):
         pygame.sprite.Sprite.__init__(self)
-        
         self.image =  pygame.image.load(img_path +f'img{num}.png')
         self.rect = self.image.get_rect()
         self.num = num
 
     def get_pos(self):
-        pos_y, pos_x = where_num(brd.board, self.num)
+        pos_y, pos_x = where.where_num(brd.board, self.num)
         pos_x = (60+pd)*pos_x + x_pd
         pos_y = (60+pd)*pos_y + y_pd
         return pos_x, pos_y
 
 
-# Find the location of input number
-def where_num(board, num):
-    for i in range(0,4):
-        for j in range(0,4):
-            if board[i][j] == num:
-                return i,j
+def draw_blocks():
+    for block in block_list:
+        screen.blit(block.image, block.get_pos())
 
+def draw_timer_text():
+    timer = timer_font.render(f'{(pygame.time.get_ticks() - start_ticks)/1000:.1f}', True, (200,200,200))
+    screen.blit(timer, (230, 20))
+    screen.blit(text, (0, 340))
+
+def stop_game():
+    global playing
+    global start_ticks
+    while True:
+        event = pygame.event.wait()
+        if event.type == pygame.QUIT:        # Quit
+            playing = False
+            break
+
+        elif event.type == pygame.KEYDOWN:   # Space bar -> Restart
+            if event.key == pygame.K_SPACE:
+                start_ticks = pygame.time.get_ticks()
+                brd.shuffle()
+                restart_sound.play()
+                break
+
+def action():
+    global playing
+    global start_ticks
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            playing = False
+        
+        elif event.type == pygame.KEYDOWN:
+            # Move blocks
+            if event.key == pygame.K_UP:
+                brd.move(1)
+                move_sound.play()
+                
+            elif event.key == pygame.K_DOWN:
+                brd.move(0)
+                move_sound.play()
+                
+            elif event.key == pygame.K_RIGHT:
+                brd.move(3)
+                move_sound.play()
+                
+            elif event.key == pygame.K_LEFT:
+                brd.move(2)
+                move_sound.play()
+            
+            # Restart the game
+            elif event.key == pygame.K_SPACE:
+                start_ticks = pygame.time.get_ticks()
+                brd.shuffle()
+                restart_sound.play()
 
 # file path
 img_path = './img/'
 sound_path = './sound/'
 
 # Initialize Board
-brd = Board()
+brd = Board.Board()
 brd.check_solvable()
 
 # Initialize pygame
@@ -106,7 +98,7 @@ pygame.display.set_caption("15-puzzle")
 
 # Image
 icon = pygame.image.load(img_path+'icon.png')
-note = pygame.image.load(img_path+'note.png')
+text = pygame.image.load(img_path+'text.png')
 pygame.display.set_icon(icon)
 
 # Screen
@@ -135,59 +127,14 @@ playing = True
 # Game loop
 while playing:
     clock.tick(60)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            playing = False
-        
-        elif event.type == pygame.KEYDOWN:
-      
-            # Move blocks
-            if event.key == pygame.K_UP:
-                brd.move(1)
-                move_sound.play()
-                
-            elif event.key == pygame.K_DOWN:
-                brd.move(0)
-                move_sound.play()
-                
-            elif event.key == pygame.K_RIGHT:
-                brd.move(3)
-                move_sound.play()
-                
-            elif event.key == pygame.K_LEFT:
-                brd.move(2)
-                move_sound.play()
-            
-            # Restart the game
-            elif event.key == pygame.K_SPACE:
-                start_ticks = pygame.time.get_ticks()
-                brd.shuffle()
-                restart_sound.play()
-        
+    action()
+    
     # Draw
     screen.fill((40,10,70))
-   
-    for block in block_list:
-        screen.blit(block.image, block.get_pos())
-    
-    timer = timer_font.render(f'{(pygame.time.get_ticks() - start_ticks)/1000:.1f}', True, (200,200,200))
-    screen.blit(timer, (230, 20))
-    screen.blit(note, (0, 340))
+    draw_blocks()
+    draw_timer_text()
     pygame.display.update()
     pygame.display.flip()
      
     if brd.is_clear(): # Stop game and wait for event
-        while True:
-            event = pygame.event.wait()
-            if event.type == pygame.QUIT:        # Quit
-                playing = False
-                break
-
-            elif event.type == pygame.KEYDOWN:   # Space bar -> Restart
-                if event.key == pygame.K_SPACE:
-                    start_ticks = pygame.time.get_ticks()
-                    brd.shuffle()
-                    restart_sound.play()
-
-                    break
-
+        stop_game()
