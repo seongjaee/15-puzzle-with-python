@@ -19,6 +19,8 @@ pip install pygame
 
 ## Manual
 
-Use arrow key to move blocks.
+Move the block with arrow key.
+
+To move blocks in the same row at once, press shift with arrow key.
 
 Use space bar to restart the game.
