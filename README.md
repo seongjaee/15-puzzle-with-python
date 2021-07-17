@@ -13,7 +13,7 @@ pygame Github repository
 
 To install pygame : 
 ```
-pip install pygame
+$ pip install pygame
 ```
 
 
