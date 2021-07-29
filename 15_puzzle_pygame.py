@@ -44,7 +44,8 @@ def stop_game(brd):
     global start_ticks
     while True:
         event = pygame.event.wait()
-        if event.type == pygame.QUIT:        # Quit
+        # Quit
+        if event.type == pygame.QUIT:        
             playing = False
             break
         
