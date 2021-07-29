@@ -1,6 +1,7 @@
 import pygame
-import random, os
+import os
 from pathlib import Path
+
 import Board
 import where
 
@@ -16,23 +17,29 @@ class Block(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.num = num
 
-    def get_pos(self):
+    @property
+    def pos(self):
         pos_y, pos_x = where.where_num(brd.board, self.num)
         pos_x = (60+pd)*pos_x + x_pd
         pos_y = (60+pd)*pos_y + y_pd
         return pos_x, pos_y
 
+class BlockList:
+    def __init__(self):
+        self.block_list = [Block(n) for n in range(1, 17)]
 
-def draw_blocks():
-    for block in block_list:
-        screen.blit(block.image, block.get_pos())
+    def draw_blocks(self, screen):
+        for block in self.block_list:
+            screen.blit(block.image, block.pos)
 
-def draw_timer_text():
+# Draw timer
+def draw_timer_text(screen):
     timer = timer_font.render(f'{(pygame.time.get_ticks() - start_ticks)/1000:.1f}', True, (200,200,200))
     screen.blit(timer, (230, 20))
     screen.blit(text, (0, 340))
 
-def stop_game():
+# Stop the game
+def stop_game(brd):
     global playing
     global start_ticks
     while True:
@@ -40,15 +47,17 @@ def stop_game():
         if event.type == pygame.QUIT:        # Quit
             playing = False
             break
-
-        elif event.type == pygame.KEYDOWN:   # Space bar -> Restart
+        
+        # Restart
+        elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 start_ticks = pygame.time.get_ticks()
                 brd.shuffle()
                 restart_sound.play()
                 break
 
-def action():
+# Playing game
+def action(brd):
     global playing
     global start_ticks
     for event in pygame.event.get():
@@ -91,62 +100,65 @@ def action():
                 brd.shuffle()
                 restart_sound.play()
 
-# file path
-img_path = './img/'
-sound_path = './sound/'
 
-# Initialize Board
-brd = Board.Board()
-brd.check_solvable()
+if __name__ == '__main__':
+    # file path
+    img_path = './img/'
+    sound_path = './sound/'
 
-# Initialize pygame
-pygame.init()
+    # Initialize Board
+    brd = Board.Board()
+    brd.make_solvable()
 
-# FPS
-clock = pygame.time.Clock()
+    # Initialize pygame
+    pygame.init()
 
-# Game title
-pygame.display.set_caption("15-puzzle")
+    # FPS
+    clock = pygame.time.Clock()
 
-# Image
-icon = pygame.image.load(img_path+'icon.png')
-text = pygame.image.load(img_path+'text.png')
-pygame.display.set_icon(icon)
+    # Game title
+    pygame.display.set_caption("15-puzzle")
 
-# Screen
-size = [300,400]
-screen = pygame.display.set_mode(size)
-screen.fill((40,10,70))
+    # Image
+    icon = pygame.image.load(img_path+'icon.png')
+    text = pygame.image.load(img_path+'text.png')
+    pygame.display.set_icon(icon)
 
-# Sound
-move_sound = pygame.mixer.Sound(sound_path + 'move.wav')
-restart_sound = pygame.mixer.Sound(sound_path + 'restart.wav')
-
-# Font
-timer_font = pygame.font.SysFont('calibri', 25)
-
-# Padding
-pd = 4
-y_pd = 60
-x_pd = 24
-
-# Create block objects
-block_list = [Block(n) for n in range(1, 17)]
-
-start_ticks = pygame.time.get_ticks()
-playing = True
-
-# Game loop
-while playing:
-    clock.tick(60)
-    action()
-
-    # Draw
+    # Screen
+    size = [300,400]
+    screen = pygame.display.set_mode(size)
     screen.fill((40,10,70))
-    draw_blocks()
-    draw_timer_text()
-    pygame.display.update()
-    pygame.display.flip()
-     
-    if brd.is_clear(): # Stop game and wait for event
-        stop_game()
+
+    # Sound
+    move_sound = pygame.mixer.Sound(sound_path + 'move.wav')
+    restart_sound = pygame.mixer.Sound(sound_path + 'restart.wav')
+
+    # Font
+    timer_font = pygame.font.SysFont('calibri', 25)
+
+    # Padding
+    pd = 4
+    y_pd = 60
+    x_pd = 24
+
+    # Create block objects
+    blocks = BlockList()
+
+    start_ticks = pygame.time.get_ticks()
+    playing = True
+
+    # Game loop
+    while playing:
+        clock.tick(60)
+        action(brd)
+
+        # Draw
+        screen.fill((40,10,70))
+        blocks.draw_blocks(screen)
+        draw_timer_text(screen)
+        pygame.display.update()
+        pygame.display.flip()
+
+        # Stop game and wait for event
+        if brd.is_clear():
+            stop_game(brd)

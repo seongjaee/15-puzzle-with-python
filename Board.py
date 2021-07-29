@@ -7,8 +7,8 @@ class Board:
         random.shuffle(temp)
         self.board = [temp[:4], temp[4:8], temp[8:12], temp[12:16]]
         
-    # Check whether puzzle is solvable or not
-    def check_solvable(self):
+    # Check whether puzzle is solvable or not amd make board solvable
+    def make_solvable(self):
         flattened = [num for row in self.board for num in row]
         cnt = 0
         for idx, num in enumerate(flattened):
