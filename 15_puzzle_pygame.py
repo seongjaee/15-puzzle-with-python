@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 import Board
-import where
+import where 
 
 # Change file directory
 DIR = Path(__file__).parent.absolute()
