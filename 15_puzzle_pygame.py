@@ -52,54 +52,47 @@ def stop_game(brd):
         # Restart
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                start_ticks = pygame.time.get_ticks()
-                brd.shuffle()
-                restart_sound.play()
+                restart(brd)
                 break
+
+def restart(brd):
+    global start_ticks
+    start_ticks = pygame.time.get_ticks()
+    brd.shuffle()
+    restart_sound.play()
 
 # Playing game
 def action(brd):
     global playing
     global start_ticks
+
+    def arrowkeydown_handler(direction):
+        if event.mod == 1:
+            brd.move(direction)
+            brd.move(direction)
+        brd.move(direction)
+        move_sound.play()
+
+    key_dict = {
+        pygame.K_DOWN: 0,
+        pygame.K_UP: 1,
+        pygame.K_LEFT: 2,
+        pygame.K_RIGHT: 3,
+        pygame.K_SPACE: 'restart'
+        }
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             playing = False
         
         elif event.type == pygame.KEYDOWN:
-            # Move blocks
-            if event.key == pygame.K_UP:
-                if event.mod == 1:
-                    brd.move(1)
-                    brd.move(1)
-                brd.move(1)
-                move_sound.play()
-                
-            elif event.key == pygame.K_DOWN:
-                if event.mod == 1:
-                    brd.move(0)
-                    brd.move(0)
-                brd.move(0)
-                move_sound.play()
-                
-            elif event.key == pygame.K_RIGHT:
-                if event.mod == 1:
-                    brd.move(3)
-                    brd.move(3)
-                brd.move(3)
-                move_sound.play()
-                
-            elif event.key == pygame.K_LEFT:
-                if event.mod == 1:
-                    brd.move(2)
-                    brd.move(2)
-                brd.move(2)
-                move_sound.play()
-            
-            # Restart the game
-            elif event.key == pygame.K_SPACE:
-                start_ticks = pygame.time.get_ticks()
-                brd.shuffle()
-                restart_sound.play()
+            key = key_dict.get(event.key)
+            if key == None:
+                continue
+            elif key == 'restart':
+                restart(brd)
+            else:
+                arrowkeydown_handler(key)
 
 
 if __name__ == '__main__':
